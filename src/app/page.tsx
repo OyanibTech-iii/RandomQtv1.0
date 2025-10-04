@@ -62,7 +62,7 @@ export default function Home() {
           
           {/* Language Filter */}
           <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {["All", "English", "Tagalog", "Bisaya"].map((language) => (
+            {["All", "English", "Tagalog", "Bisaya", "Bible"].map((language) => (
               <button
                 key={language}
                 onClick={() => setSelectedLanguage(language)}
