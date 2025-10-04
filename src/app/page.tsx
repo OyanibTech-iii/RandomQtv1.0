@@ -7,18 +7,30 @@ export default function Home() {
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("All");
 
   // Generate initial quote
   useEffect(() => {
     generateNewQuote();
   }, []);
 
+  // Regenerate quote when language filter changes
+  useEffect(() => {
+    if (selectedLanguage !== "All") {
+      generateNewQuote();
+    }
+  }, [selectedLanguage]);
+
   const generateNewQuote = () => {
     setIsLoading(true);
     // Add a small delay for better UX
     setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[randomIndex]);
+      const filteredQuotes = selectedLanguage === "All" 
+        ? quotes 
+        : quotes.filter(quote => quote.language === selectedLanguage);
+      
+      const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+      setCurrentQuote(filteredQuotes[randomIndex]);
       setIsLoading(false);
     }, 300);
   };
@@ -44,9 +56,26 @@ export default function Home() {
           <h1 className="text-4xl md:text-6xl font-bold text-aquamarine-800 dark:text-aquamarine-200 mb-4">
             Random Quote Generator
           </h1>
-          <p className="text-lg text-aquamarine-700 dark:text-aquamarine-300">
+          <p className="text-lg text-aquamarine-700 dark:text-aquamarine-300 mb-6">
             Discover inspiration with every click
           </p>
+          
+          {/* Language Filter */}
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {["All", "English", "Tagalog", "Bisaya"].map((language) => (
+              <button
+                key={language}
+                onClick={() => setSelectedLanguage(language)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  selectedLanguage === language
+                    ? "bg-aquamarine-600 text-aquamarine-50 shadow-lg"
+                    : "bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-200 dark:hover:bg-aquamarine-700"
+                }`}
+              >
+                {language}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Quote Card */}
@@ -66,14 +95,19 @@ export default function Home() {
                 "{currentQuote.text}"
               </blockquote>
               
-              {/* Author and category */}
+              {/* Author, category, and language */}
               <div className="text-center">
                 <p className="text-xl md:text-2xl font-semibold text-aquamarine-600 dark:text-aquamarine-300 mb-2">
                   — {currentQuote.author}
                 </p>
-                <span className="inline-block px-4 py-2 bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-200 rounded-full text-sm font-medium">
-                  {currentQuote.category}
-                </span>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <span className="inline-block px-4 py-2 bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-200 rounded-full text-sm font-medium">
+                    {currentQuote.category}
+                  </span>
+                  <span className="inline-block px-4 py-2 bg-aquamarine-200 dark:bg-aquamarine-700 text-aquamarine-800 dark:text-aquamarine-100 rounded-full text-sm font-medium">
+                    {currentQuote.language}
+                  </span>
+                </div>
               </div>
             </div>
           ) : null}
